@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>万象卡</title>
+    <meta name="theme-color" content="#303030" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="万象卡" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="assets/app-icon.svg" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="decor-layer" aria-hidden="true">
+      <span class="petal petal-a"></span>
+      <span class="petal petal-b"></span>
+      <span class="petal petal-c"></span>
+      <span class="petal petal-d"></span>
+      <span class="petal petal-e"></span>
+      <span class="petal petal-f"></span>
+      <span class="petal petal-g"></span>
+    </div>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-block">
+          <p class="eyebrow">梅花易数 · 万物类象记忆</p>
+          <h1>万象卡</h1>
+        </div>
+        <nav class="app-nav" aria-label="主导航">
+          <button data-route="home" data-top-route="home">首页</button>
+          <button data-route="learn" data-top-route="learn">八卦</button>
+          <button data-route="cards" data-top-route="cards">卡片</button>
+          <button data-route="plan" data-top-route="plan">计划</button>
+        </nav>
+        <div class="top-actions">
+          <label class="search-box" aria-label="搜索类象">
+            <span>⌕</span>
+            <input id="searchInput" type="search" placeholder="搜索万物类象" />
+          </label>
+          <button class="icon-button" id="resetProgress" title="重置学习进度" aria-label="重置学习进度">
+            ↻
+          </button>
+        </div>
+      </header>
+
+      <main class="workspace workspace-single">
+        <section id="appView" class="content"></section>
+        <div class="legacy-hidden" aria-hidden="true">
+          <strong id="cardCount">0</strong>
+          <small id="masteryText">熟悉率 0%</small>
+          <nav id="trigramNav"></nav>
+          <section id="overviewView" class="view"></section>
+          <section id="cardsView" class="view"></section>
+          <section id="quizView" class="view"></section>
+          <section id="searchView" class="view"></section>
+        </div>
+      </main>
+    </div>
+
+    <script src="sync-config.js?v=20260715-supabase"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js?v=20260715-account-sync"></script>
+  </body>
+</html>
