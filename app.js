@@ -876,15 +876,15 @@ function renderSyncPanel(compact = false) {
       <div>
         <span>账号同步</span>
         <strong>${email || syncState.status}</strong>
-        ${syncState.message ? `<small>${escapeHtml(syncState.message)}</small>` : `<small>${configured ? "手机端登录同一账号后同步学习数据" : "填写 sync-config.js 后启用云端账号"}</small>`}
+        ${syncState.message ? `<small>${escapeHtml(syncState.message)}</small>` : `<small>${configured ? "邮箱登录后，手机和电脑自动同步" : "填写 sync-config.js 后启用云端账号"}</small>`}
       </div>
       ${
         configured
           ? syncState.user
             ? `<button class="text-button" data-sync-action="logout">退出</button>`
             : `<form class="sync-form" data-sync-login>
-                <input name="email" type="email" placeholder="邮箱登录" required />
-                <button class="primary-button" type="submit">发送登录链接</button>
+                <input name="email" type="email" placeholder="输入邮箱" required />
+                <button class="primary-button" type="submit">登录 / 同步</button>
               </form>`
           : `<button class="text-button" data-route="plan">配置说明</button>`
       }
@@ -1154,7 +1154,36 @@ function renderLearningHome() {
         <div><span>已学习</span><strong>${summary.total}</strong></div>
         <div><span>熟悉率</span><strong>${summary.mastery}%</strong></div>
       </div>
+      ${renderHomeAddPanel()}
       ${renderSyncPanel(true)}
+    </section>
+  `;
+}
+
+function renderHomeAddPanel() {
+  return `
+    <section class="home-add-panel">
+      <div>
+        <p class="eyebrow">我的类象</p>
+        <h3>新增类象</h3>
+      </div>
+      <form class="home-add-form" data-home-custom-form>
+        <label class="home-add-input">
+          <span>类象名称</span>
+          <input name="customValue" type="text" placeholder="例如：大地、高楼、雨夜" autocomplete="off" />
+        </label>
+        <fieldset class="trigram-checks">
+          <legend>归属卦象</legend>
+          ${TRIGRAMS.map((trigram) => `
+            <label>
+              <input type="checkbox" name="trigramNames" value="${trigram.name}" />
+              <span>${trigram.name}${trigram.symbol}</span>
+            </label>
+          `).join("")}
+        </fieldset>
+        <button class="primary-button" type="submit">添加</button>
+      </form>
+      ${learningState.customMessage ? `<p class="form-message">${escapeHtml(learningState.customMessage)}</p>` : ""}
     </section>
   `;
 }
@@ -1335,30 +1364,48 @@ function existingItemsForTrigram(trigramName) {
   return ALL_ITEMS.filter((item) => item.trigram === trigramName);
 }
 
-function addCustomItem(trigramName, rawValue) {
+function addCustomItems(trigramNames, rawValue) {
   const value = normalizeSearchTerm(rawValue);
   if (!value) {
     learningState.customMessage = "请先输入一个类象。";
     return false;
   }
-  const duplicate = existingItemsForTrigram(trigramName).find((item) => normalizeSearchTerm(item.value) === value);
-  if (duplicate) {
-    learningState.customMessage = `“${value}”已存在于${trigramName}卦的「${duplicate.category}」中，未重复添加。`;
+  const names = [...new Set([].concat(trigramNames || []).filter((name) => TRIGRAMS.some((item) => item.name === name)))];
+  if (!names.length) {
+    learningState.customMessage = "请选择至少一个卦象。";
     return false;
   }
-  const item = {
-    id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    trigram: trigramName,
-    source: "custom",
-    category: "我的类象",
-    value
-  };
   const customItems = readCustomItems();
-  customItems.push(item);
+  const groupId = `custom-group-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const added = [];
+  const skipped = [];
+  names.forEach((trigramName) => {
+    const duplicate = existingItemsForTrigram(trigramName).find((item) => normalizeSearchTerm(item.value) === value);
+    if (duplicate) {
+      skipped.push(trigramName);
+      return;
+    }
+    const item = {
+      id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${trigramName}`,
+      groupId,
+      trigram: trigramName,
+      source: "custom",
+      category: "我的类象",
+      value
+    };
+    customItems.push(item);
+    ALL_ITEMS.push(item);
+    added.push(trigramName);
+  });
   saveCustomItems(customItems);
-  ALL_ITEMS.push(item);
-  learningState.customMessage = `已添加“${value}”。`;
-  return true;
+  const addedText = added.length ? `已添加到${added.join("、")}卦` : "";
+  const skippedText = skipped.length ? `${skipped.join("、")}卦已存在，未重复添加` : "";
+  learningState.customMessage = [`“${value}”`, addedText, skippedText].filter(Boolean).join("；") + "。";
+  return Boolean(added.length);
+}
+
+function addCustomItem(trigramName, rawValue) {
+  return addCustomItems([trigramName], rawValue);
 }
 
 function removeCustomItem(id) {
@@ -1435,7 +1482,6 @@ function renderMemoryCards() {
       </div>
 
       <aside class="memory-side">
-        ${renderSyncPanel(true)}
         <div class="progress-panel">
           <span>已学习</span>
           <strong>${summary.total}</strong>
@@ -1620,6 +1666,15 @@ document.addEventListener("submit", (event) => {
       syncState.message = error ? error.message : "点击邮件中的链接后会自动回到本页面。";
       renderLearningApp();
     });
+    return;
+  }
+
+  const homeCustomForm = event.target.closest("[data-home-custom-form]");
+  if (homeCustomForm) {
+    event.preventDefault();
+    const formData = new FormData(homeCustomForm);
+    addCustomItems(formData.getAll("trigramNames"), formData.get("customValue"));
+    renderLearningApp();
     return;
   }
 
