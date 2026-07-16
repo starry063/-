@@ -1149,6 +1149,143 @@ button:active {
   gap: 8px;
 }
 
+.bagua-reference {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.bagua-card {
+  position: relative;
+  min-height: 360px;
+  border: 1px solid var(--line);
+  border-radius: var(--arc-card);
+  background:
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.88) 0 17%, transparent 17% 100%),
+    radial-gradient(circle at center, transparent 0 38%, rgba(48, 48, 48, 0.06) 38% 39%, transparent 39% 100%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.74), rgba(245, 245, 245, 0.68));
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+}
+
+.bagua-card::before,
+.bagua-card::after {
+  content: "";
+  position: absolute;
+  inset: 46px;
+  border: 1px solid rgba(48, 48, 48, 0.1);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.bagua-card::after {
+  inset: 92px;
+  opacity: 0.7;
+}
+
+.bagua-center {
+  position: absolute;
+  inset: 50%;
+  width: 118px;
+  height: 118px;
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 4px;
+  border: 1px solid rgba(48, 48, 48, 0.16);
+  border-radius: 50%;
+  background: rgba(252, 252, 252, 0.86);
+  text-align: center;
+  z-index: 2;
+}
+
+.bagua-center strong {
+  font-family: var(--font-title);
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.bagua-center span,
+.bagua-node span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.bagua-node {
+  position: absolute;
+  width: 76px;
+  min-height: 58px;
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  padding: 8px 9px;
+  border: 1px solid rgba(48, 48, 48, 0.14);
+  border-radius: 18px 18px 18px 6px;
+  background: rgba(252, 252, 252, 0.82);
+  color: var(--ink);
+  text-align: center;
+  z-index: 3;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.bagua-node strong {
+  font-family: var(--font-title);
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.bagua-node:hover {
+  border-color: var(--ink);
+  background: rgba(252, 252, 252, 0.96);
+  transform: translateY(-1px);
+}
+
+.bagua-node.top {
+  top: 22px;
+  left: 50%;
+  translate: -50% 0;
+}
+
+.bagua-node.top-right {
+  top: 66px;
+  right: 52px;
+}
+
+.bagua-node.right {
+  top: 50%;
+  right: 22px;
+  translate: 0 -50%;
+}
+
+.bagua-node.bottom-right {
+  right: 52px;
+  bottom: 66px;
+}
+
+.bagua-node.bottom {
+  bottom: 22px;
+  left: 50%;
+  translate: -50% 0;
+}
+
+.bagua-node.bottom-left {
+  bottom: 66px;
+  left: 52px;
+}
+
+.bagua-node.left {
+  top: 50%;
+  left: 22px;
+  translate: 0 -50%;
+}
+
+.bagua-node.top-left {
+  top: 66px;
+  left: 52px;
+}
+
 .plan-panel {
   padding: 16px;
   border: 1px solid var(--line);
@@ -1875,6 +2012,7 @@ button:active {
   .entry-grid,
   .home-hero,
   .home-add-panel,
+  .bagua-reference,
   .trigram-study-grid,
   .memory-layout,
   .review-plan,
@@ -1967,6 +2105,61 @@ button:active {
 
   .home-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bagua-card {
+    min-height: 330px;
+  }
+
+  .bagua-card::before {
+    inset: 42px;
+  }
+
+  .bagua-card::after {
+    inset: 86px;
+  }
+
+  .bagua-center {
+    width: 104px;
+    height: 104px;
+  }
+
+  .bagua-center strong {
+    font-size: 20px;
+  }
+
+  .bagua-node {
+    width: 68px;
+    min-height: 54px;
+    padding: 7px;
+  }
+
+  .bagua-node strong {
+    font-size: 17px;
+  }
+
+  .bagua-node.top-right {
+    right: 34px;
+  }
+
+  .bagua-node.right {
+    right: 12px;
+  }
+
+  .bagua-node.bottom-right {
+    right: 34px;
+  }
+
+  .bagua-node.bottom-left {
+    left: 34px;
+  }
+
+  .bagua-node.left {
+    left: 12px;
+  }
+
+  .bagua-node.top-left {
+    left: 34px;
   }
 
   .home-add-panel .form-message {

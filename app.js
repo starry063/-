@@ -1169,9 +1169,45 @@ function renderLearningHome() {
         <div><span>已学习</span><strong>${summary.total}</strong></div>
         <div><span>熟悉率</span><strong>${summary.mastery}%</strong></div>
       </div>
+      ${renderBaguaReference()}
       ${renderHomeAddPanel()}
       ${renderSyncPanel(true)}
     </section>
+  `;
+}
+
+function renderBaguaReference() {
+  const xiantian = [
+    ["乾", "南", "top"], ["兑", "东南", "top-right"], ["离", "东", "right"], ["震", "东北", "bottom-right"],
+    ["坤", "北", "bottom"], ["艮", "西北", "bottom-left"], ["坎", "西", "left"], ["巽", "西南", "top-left"]
+  ];
+  const houtian = [
+    ["离", "南", "top"], ["坤", "西南", "top-right"], ["兑", "西", "right"], ["乾", "西北", "bottom-right"],
+    ["坎", "北", "bottom"], ["艮", "东北", "bottom-left"], ["震", "东", "left"], ["巽", "东南", "top-left"]
+  ];
+  return `
+    <section class="bagua-reference" aria-label="先天八卦与后天八卦参考">
+      ${renderBaguaDiagram("先天八卦", "伏羲方位", xiantian)}
+      ${renderBaguaDiagram("后天八卦", "文王方位", houtian)}
+    </section>
+  `;
+}
+
+function renderBaguaDiagram(title, subtitle, positions) {
+  return `
+    <article class="bagua-card">
+      <div class="bagua-center">
+        <strong>${title}</strong>
+        <span>${subtitle}</span>
+      </div>
+      ${positions.map(([name, direction, position]) => {
+        const trigram = trigramByName(name);
+        return `<button class="bagua-node ${position}" data-study-trigram="${name}">
+          <strong>${name}${trigram.symbol}</strong>
+          <span>${direction}</span>
+        </button>`;
+      }).join("")}
+    </article>
   `;
 }
 
