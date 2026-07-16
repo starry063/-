@@ -726,7 +726,8 @@ const learningState = {
   review: readReviewState(),
   studyGoal: readStudyGoal(),
   customMessage: "",
-  goalMessage: ""
+  goalMessage: "",
+  homeAddQuery: ""
 };
 
 const appView = () => document.querySelector("#appView");
@@ -954,6 +955,20 @@ function exactItemExists(rawValue) {
   return value && ALL_ITEMS.some((item) => normalizeSearchTerm(item.value) === value);
 }
 
+function homeAddSuggestions(rawValue) {
+  const query = normalizeSearchTerm(rawValue);
+  if (!query) return { query: "", exact: [], similar: [], related: [] };
+  const results = searchItems(query);
+  const exact = results.filter((item) => normalizeSearchTerm(item.value) === query).slice(0, 8);
+  const similar = results.filter((item) => normalizeSearchTerm(item.value) !== query).slice(0, 8);
+  return {
+    query,
+    exact,
+    similar,
+    related: relatedTrigramsForSearch(query).slice(0, 4)
+  };
+}
+
 function dueReviewCountForKey(dayKey) {
   return Object.values(learningState.review).filter((entry) => entry?.dueAt === dayKey && !entry.retired).length;
 }
@@ -1161,6 +1176,7 @@ function renderLearningHome() {
 }
 
 function renderHomeAddPanel() {
+  const suggestion = homeAddSuggestions(learningState.homeAddQuery);
   return `
     <section class="home-add-panel">
       <div>
@@ -1170,8 +1186,9 @@ function renderHomeAddPanel() {
       <form class="home-add-form" data-home-custom-form>
         <label class="home-add-input">
           <span>类象名称</span>
-          <input name="customValue" type="text" placeholder="例如：大地、高楼、雨夜" autocomplete="off" />
+          <input name="customValue" type="text" value="${escapeHtml(learningState.homeAddQuery)}" placeholder="例如：大地、高楼、雨夜" autocomplete="off" data-home-add-input />
         </label>
+        <div class="home-add-suggestions">${renderHomeAddSuggestions(suggestion)}</div>
         <fieldset class="trigram-checks">
           <legend>归属卦象</legend>
           ${TRIGRAMS.map((trigram) => `
@@ -1186,6 +1203,32 @@ function renderHomeAddPanel() {
       ${learningState.customMessage ? `<p class="form-message">${escapeHtml(learningState.customMessage)}</p>` : ""}
     </section>
   `;
+}
+
+function renderHomeAddSuggestions(suggestion) {
+  if (!suggestion.query) {
+    return `<div class="add-suggestion add-suggestion-empty">输入后先匹配已有类象，避免重复添加。</div>`;
+  }
+  const exactRows = suggestion.exact.map((item) => renderSuggestionChip(item, "已存在")).join("");
+  const similarRows = suggestion.similar.map((item) => renderSuggestionChip(item, "相似")).join("");
+  const relatedRows = suggestion.related.map(({ trigram }) => `<button class="suggest-trigram" type="button" data-study-trigram="${trigram.name}">${trigram.name}${trigram.symbol}<span>${trigram.element} · ${trigram.direction}</span></button>`).join("");
+  return `
+    <div class="add-suggestion">
+      ${suggestion.exact.length ? `<div class="suggest-section"><strong>已存在</strong><div>${exactRows}</div></div>` : ""}
+      ${suggestion.similar.length ? `<div class="suggest-section"><strong>相似类象</strong><div>${similarRows}</div></div>` : ""}
+      ${suggestion.related.length ? `<div class="suggest-section"><strong>相关卦</strong><div class="suggest-trigrams">${relatedRows}</div></div>` : ""}
+      ${!suggestion.exact.length && !suggestion.similar.length && !suggestion.related.length ? `<span>没有匹配项，可以选择卦象后添加。</span>` : ""}
+    </div>
+  `;
+}
+
+function renderSuggestionChip(item, label) {
+  const trigram = trigramByName(item.trigram);
+  return `<button class="suggest-chip" type="button" data-result-trigram="${trigram.name}">
+    <span>${label}</span>
+    <strong>${escapeHtml(item.value)}</strong>
+    <em>${trigram.name}${trigram.symbol} · ${item.category}</em>
+  </button>`;
 }
 
 function renderStudyPlanPage() {
@@ -1673,7 +1716,8 @@ document.addEventListener("submit", (event) => {
   if (homeCustomForm) {
     event.preventDefault();
     const formData = new FormData(homeCustomForm);
-    addCustomItems(formData.getAll("trigramNames"), formData.get("customValue"));
+    const added = addCustomItems(formData.getAll("trigramNames"), formData.get("customValue"));
+    if (added) learningState.homeAddQuery = "";
     renderLearningApp();
     return;
   }
@@ -1710,6 +1754,17 @@ document.querySelector("#searchInput").addEventListener("input", () => {
   learningState.screen = "search";
   learningState.customMessage = "";
   renderLearningApp();
+});
+
+document.addEventListener("input", (event) => {
+  const homeAddInput = event.target.closest("[data-home-add-input]");
+  if (!homeAddInput) return;
+  learningState.homeAddQuery = homeAddInput.value;
+  learningState.customMessage = "";
+  if (learningState.screen === "home") {
+    const suggestionBox = document.querySelector(".home-add-suggestions");
+    if (suggestionBox) suggestionBox.innerHTML = renderHomeAddSuggestions(homeAddSuggestions(learningState.homeAddQuery));
+  }
 });
 
 document.querySelector("#resetProgress").addEventListener("click", () => {

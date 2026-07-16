@@ -1,4 +1,4 @@
-const CACHE_NAME = "wanxiang-card-v4";
+const CACHE_NAME = "wanxiang-card-v5";
 const APP_ASSETS = [
   "./",
   "./index.html",

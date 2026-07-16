@@ -1267,6 +1267,78 @@ button:active {
   min-width: min(430px, 100%);
 }
 
+.home-add-suggestions {
+  flex: 1 1 100%;
+}
+
+.add-suggestion {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+  padding: 12px;
+  border: 1px dashed rgba(48, 48, 48, 0.18);
+  border-radius: 18px 18px 18px 7px;
+  background: rgba(248, 248, 248, 0.66);
+  color: var(--muted);
+}
+
+.add-suggestion-empty {
+  min-height: 42px;
+  align-items: center;
+}
+
+.suggest-section {
+  display: grid;
+  gap: 7px;
+}
+
+.suggest-section > strong {
+  color: var(--ink);
+  font-family: var(--font-title);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.suggest-section > div,
+.suggest-trigrams {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.suggest-chip,
+.suggest-trigram {
+  display: inline-grid;
+  gap: 2px;
+  min-height: 44px;
+  padding: 8px 11px;
+  border: 1px solid rgba(48, 48, 48, 0.14);
+  border-radius: 18px 18px 18px 7px;
+  background: rgba(252, 252, 252, 0.78);
+  color: var(--ink);
+  text-align: left;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.suggest-chip:hover,
+.suggest-trigram:hover {
+  border-color: var(--ink);
+  background: rgba(252, 252, 252, 0.96);
+  transform: translateY(-1px);
+}
+
+.suggest-chip span,
+.suggest-chip em,
+.suggest-trigram span {
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+}
+
+.suggest-chip strong {
+  font-weight: 500;
+}
+
 .trigram-checks legend {
   width: 100%;
   color: var(--muted);
