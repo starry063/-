@@ -1118,7 +1118,11 @@ function renderLearningHome() {
       <section class="home-hero">
         <div class="home-copy">
           <p class="eyebrow">万物类象记忆</p>
-          <h2>以卡片掌象，以分类入卦</h2>
+          <h2>今日掌象</h2>
+          <div class="home-actions">
+            <button class="primary-button" data-route="cards">开始复习</button>
+            <button class="text-button" data-route="learn">查看八卦</button>
+          </div>
         </div>
         <div class="today-panel">
           <span>今日</span>
@@ -1431,6 +1435,7 @@ function renderMemoryCards() {
       </div>
 
       <aside class="memory-side">
+        ${renderSyncPanel(true)}
         <div class="progress-panel">
           <span>已学习</span>
           <strong>${summary.total}</strong>

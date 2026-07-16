@@ -16,14 +16,14 @@
   --palette-ink: #303030;
   --blossom: #b8b8b8;
   --blossom-soft: rgba(190, 190, 190, 0.38);
-  --shadow: 0 24px 70px rgba(30, 30, 30, 0.12);
-  --shadow-soft: 0 10px 28px rgba(30, 30, 30, 0.08);
+  --shadow: 0 18px 48px rgba(30, 30, 30, 0.1);
+  --shadow-soft: 0 8px 22px rgba(30, 30, 30, 0.07);
   --font-body: ui-serif, "Songti SC", "STSong", "Noto Serif CJK SC",
     "Source Han Serif SC", "SimSun", serif;
   --font-title: "Songti SC", "STSong", "Source Han Serif SC", "Noto Serif CJK SC",
     "FangSong", "STFangsong", "SimSun", serif;
-  --arc-card: 30px;
-  --arc-card-large: 42px;
+  --arc-card: 24px;
+  --arc-card-large: 34px;
   --arc-pill: 999px;
 }
 
@@ -70,7 +70,7 @@ body::after {
   z-index: -1;
   pointer-events: none;
   background: url("assets/plum-wash.png") center center / cover no-repeat;
-  opacity: 0.42;
+  opacity: 0.32;
   filter: grayscale(1) saturate(0) brightness(1.05) contrast(0.9);
   mix-blend-mode: multiply;
 }
@@ -88,9 +88,8 @@ button {
 .app-shell {
   min-height: 100vh;
   background:
-    linear-gradient(180deg, rgba(248, 248, 248, 0.14), rgba(246, 246, 246, 0.66)),
-    radial-gradient(circle at 76% 4%, rgba(255, 255, 255, 0.5), transparent 26%),
-    radial-gradient(circle at 13% 88%, rgba(196, 196, 196, 0.16), transparent 28%);
+    linear-gradient(180deg, rgba(248, 248, 248, 0.3), rgba(246, 246, 246, 0.72)),
+    radial-gradient(circle at 76% 4%, rgba(255, 255, 255, 0.42), transparent 24%);
   position: relative;
   z-index: 1;
 }
@@ -113,7 +112,7 @@ button {
     radial-gradient(circle at 65% 34%, rgba(255, 255, 255, 0.52), transparent 42%),
     linear-gradient(135deg, rgba(218, 218, 218, 0.56), rgba(150, 150, 150, 0.26));
   box-shadow: inset 0 0 0 1px rgba(48, 48, 48, 0.04);
-  opacity: 0.46;
+  opacity: 0.32;
   transform: rotate(24deg);
   animation: petal-fall var(--fall-duration, 22s) linear infinite;
   animation-delay: var(--fall-delay, 0s);
@@ -196,10 +195,9 @@ button {
   grid-template-columns: minmax(154px, auto) minmax(260px, 1fr) minmax(280px, 480px);
   align-items: center;
   gap: 18px;
-  padding: 18px clamp(18px, 4vw, 44px);
+  padding: 14px clamp(18px, 4vw, 44px);
   border-bottom: 1px solid rgba(48, 48, 48, 0.16);
-  background:
-    linear-gradient(180deg, rgba(252, 252, 252, 0.9), rgba(246, 246, 246, 0.72));
+  background: rgba(248, 248, 248, 0.84);
   backdrop-filter: blur(20px);
   position: sticky;
   top: 0;
@@ -226,7 +224,7 @@ button {
 h1 {
   margin: 0;
   font-family: var(--font-title);
-  font-size: clamp(32px, 4vw, 52px);
+  font-size: clamp(28px, 3.2vw, 44px);
   line-height: 1.02;
   font-weight: 500;
 }
@@ -243,13 +241,13 @@ h1 {
   padding: 5px;
   border: 1px solid rgba(48, 48, 48, 0.12);
   border-radius: var(--arc-pill);
-  background: rgba(255, 255, 255, 0.56);
-  box-shadow: var(--shadow-soft);
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: none;
 }
 
 .app-nav button {
   min-width: 64px;
-  min-height: 36px;
+  min-height: 38px;
   border: 0;
   border-radius: var(--arc-pill);
   background: transparent;
@@ -354,7 +352,7 @@ button:active {
   display: block;
   max-width: 1220px;
   margin: 0 auto;
-  padding-top: 30px;
+  padding-top: 22px;
 }
 
 .legacy-hidden {
@@ -378,11 +376,11 @@ button:active {
 .search-results,
 .category-card {
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(244, 244, 244, 0.84)),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(245, 245, 245, 0.76)),
     var(--paper-strong);
   border: 1px solid var(--line);
   border-radius: var(--arc-card);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-soft);
   backdrop-filter: blur(7px);
   overflow: hidden;
 }
@@ -510,12 +508,12 @@ button:active {
 .primary-button,
 .answer-button,
 .grade-button {
-  min-height: 40px;
+  min-height: 42px;
   border: 1px solid var(--line);
   border-radius: var(--arc-pill);
   background: rgba(252, 252, 252, 0.76);
   color: var(--ink);
-  padding: 8px 14px;
+  padding: 8px 15px;
   transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, color 180ms ease, box-shadow 180ms ease;
 }
 
@@ -524,7 +522,7 @@ button:active {
   background: var(--ink);
   color: #ffffff;
   border-color: var(--ink);
-  box-shadow: 0 12px 28px rgba(30, 30, 30, 0.16);
+  box-shadow: 0 8px 18px rgba(30, 30, 30, 0.14);
 }
 
 .primary-button:hover {
@@ -675,10 +673,10 @@ button:active {
 }
 
 .meta-item {
-  padding: 12px;
-  background: rgba(252, 252, 252, 0.58);
+  padding: 11px 12px;
+  background: rgba(252, 252, 252, 0.62);
   border: 1px solid rgba(48, 48, 48, 0.1);
-  border-radius: 20px 20px 20px 8px;
+  border-radius: 18px 18px 18px 7px;
   min-width: 0;
 }
 
@@ -714,8 +712,8 @@ button:active {
 .tag {
   display: inline-flex;
   align-items: center;
-  min-height: 30px;
-  padding: 5px 10px;
+  min-height: 32px;
+  padding: 5px 11px;
   border-radius: 999px;
   background: rgba(252, 252, 252, 0.66);
   border: 1px solid rgba(48, 48, 48, 0.14);
@@ -730,7 +728,7 @@ button:active {
 }
 
 .category-card {
-  padding: 16px;
+  padding: 15px;
   position: relative;
   overflow: hidden;
   transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
@@ -754,9 +752,9 @@ button:active {
 }
 
 .category-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   border-color: rgba(48, 48, 48, 0.32);
-  box-shadow: 0 20px 58px rgba(30, 30, 30, 0.12);
+  box-shadow: 0 14px 34px rgba(30, 30, 30, 0.1);
 }
 
 .category-card p {
@@ -767,7 +765,7 @@ button:active {
 
 .tool-panel {
   min-height: 430px;
-  padding: 22px;
+  padding: 18px;
   position: relative;
   overflow: hidden;
 }
@@ -786,9 +784,9 @@ button:active {
   display: grid;
   place-items: center;
   min-height: 300px;
-  padding: 24px;
+  padding: 22px;
   border: 1px dashed var(--line-strong);
-  border-radius: var(--arc-card-large);
+  border-radius: 30px;
   background:
     linear-gradient(180deg, rgba(252, 252, 252, 0.84), rgba(244, 244, 244, 0.64)),
     rgba(252, 252, 252, 0.72);
@@ -804,7 +802,7 @@ button:active {
 .flashcard::before {
   content: "";
   position: absolute;
-  inset: 18px;
+  inset: 14px;
   border: 1px solid rgba(48, 48, 48, 0.12);
   border-radius: calc(var(--arc-card-large) - 12px);
   pointer-events: none;
@@ -812,8 +810,8 @@ button:active {
 
 .flashcard:hover {
   border-color: var(--ink);
-  box-shadow: 0 20px 58px rgba(30, 30, 30, 0.12), inset 0 0 0 1px rgba(255, 255, 255, 0.48);
-  transform: translateY(-2px);
+  box-shadow: 0 14px 38px rgba(30, 30, 30, 0.11), inset 0 0 0 1px rgba(255, 255, 255, 0.48);
+  transform: translateY(-1px);
 }
 
 .flashcard.is-flipped {
@@ -841,7 +839,7 @@ button:active {
 
 .flashcard .main {
   font-family: var(--font-title);
-  font-size: clamp(30px, 5vw, 58px);
+  font-size: clamp(32px, 5vw, 64px);
   line-height: 1.1;
   font-weight: 500;
 }
@@ -946,27 +944,27 @@ button:active {
 
 .learning-home {
   display: grid;
-  gap: 20px;
-  min-height: calc(100vh - 168px);
-  align-content: center;
+  gap: 16px;
+  min-height: calc(100vh - 150px);
+  align-content: start;
 }
 
 .home-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 280px;
-  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 14px;
   align-items: stretch;
 }
 
 .home-copy {
-  min-height: 260px;
-  padding: clamp(26px, 4vw, 46px);
+  min-height: 220px;
+  padding: clamp(24px, 3vw, 38px);
   display: grid;
-  align-content: end;
+  align-content: space-between;
   border: 1px solid var(--line);
   border-radius: var(--arc-card-large);
   background:
-    linear-gradient(120deg, rgba(255, 255, 255, 0.78), rgba(244, 244, 244, 0.58)),
+    linear-gradient(120deg, rgba(255, 255, 255, 0.86), rgba(244, 244, 244, 0.62)),
     url("assets/ink-landscape-bg.png") center bottom / cover no-repeat;
   box-shadow: var(--shadow);
   overflow: hidden;
@@ -978,8 +976,8 @@ button:active {
   position: absolute;
   top: 12px;
   right: clamp(18px, 4vw, 42px);
-  color: rgba(48, 48, 48, 0.08);
-  font-size: clamp(90px, 18vw, 190px);
+  color: rgba(48, 48, 48, 0.06);
+  font-size: clamp(82px, 14vw, 150px);
   line-height: 1;
 }
 
@@ -987,9 +985,17 @@ button:active {
 .page-head h2 {
   margin: 0;
   font-family: var(--font-title);
-  font-size: clamp(28px, 4vw, 52px);
+  font-size: clamp(28px, 3.6vw, 48px);
   line-height: 1.12;
   font-weight: 500;
+  position: relative;
+  z-index: 1;
+}
+
+.home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   position: relative;
   z-index: 1;
 }
@@ -1003,7 +1009,7 @@ button:active {
 }
 
 .today-panel {
-  padding: 24px;
+  padding: 22px;
   display: grid;
   align-content: end;
   gap: 8px;
@@ -1012,7 +1018,7 @@ button:active {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(240, 240, 240, 0.72)),
     rgba(252, 252, 252, 0.86);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-soft);
   position: relative;
   overflow: hidden;
 }
@@ -1039,7 +1045,7 @@ button:active {
 
 .today-panel strong {
   font-family: var(--font-title);
-  font-size: clamp(58px, 9vw, 96px);
+  font-size: clamp(54px, 7vw, 82px);
   font-weight: 500;
   line-height: 0.95;
 }
@@ -1052,23 +1058,23 @@ button:active {
 .entry-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  gap: 12px;
 }
 
 .entry-card {
-  min-height: 210px;
-  padding: 22px;
+  min-height: 170px;
+  padding: 20px;
   display: grid;
   align-content: end;
   gap: 12px;
   text-align: left;
   color: var(--ink);
   border: 1px solid var(--line);
-  border-radius: 34px 34px 34px 12px;
+  border-radius: 28px 28px 28px 10px;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(244, 244, 244, 0.7)),
     rgba(252, 252, 252, 0.82);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-soft);
   position: relative;
   overflow: hidden;
   transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease, background 200ms ease;
@@ -1081,7 +1087,7 @@ button:active {
   background:
     linear-gradient(135deg, rgba(252, 252, 252, 0.22), rgba(252, 252, 252, 0.68)),
     url("assets/plum-wash.png") center / cover no-repeat;
-  opacity: 0.2;
+  opacity: 0.14;
   filter: grayscale(0.3) saturate(0.7);
 }
 
@@ -1105,8 +1111,8 @@ button:active {
 
 .entry-card:hover {
   border-color: var(--ink);
-  transform: translateY(-4px);
-  box-shadow: 0 28px 80px rgba(30, 30, 30, 0.16);
+  transform: translateY(-2px);
+  box-shadow: 0 18px 44px rgba(30, 30, 30, 0.12);
 }
 
 .entry-card:hover::after {
@@ -1118,15 +1124,15 @@ button:active {
   position: absolute;
   top: 18px;
   right: 22px;
-  color: rgba(48, 48, 48, 0.1);
-  font-size: 82px;
+  color: rgba(48, 48, 48, 0.08);
+  font-size: 70px;
   line-height: 1;
   font-weight: 700;
 }
 
 .entry-card strong {
   font-family: var(--font-title);
-  font-size: clamp(24px, 2.8vw, 34px);
+  font-size: clamp(22px, 2.3vw, 30px);
   font-weight: 500;
 }
 
@@ -1140,17 +1146,17 @@ button:active {
 .home-stats {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
 }
 
 .plan-panel {
-  padding: 18px;
+  padding: 16px;
   border: 1px solid var(--line);
-  border-radius: var(--arc-card-large);
+  border-radius: var(--arc-card);
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.76), rgba(244, 244, 244, 0.72)),
     rgba(252, 252, 252, 0.82);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-soft);
 }
 
 .plan-head {
@@ -1226,9 +1232,9 @@ button:active {
 
 .plan-metrics div,
 .review-plan div {
-  padding: 12px;
+  padding: 12px 13px;
   border: 1px solid rgba(48, 48, 48, 0.12);
-  border-radius: 24px;
+  border-radius: 20px 20px 20px 8px;
   background: rgba(252, 252, 252, 0.62);
 }
 
@@ -1258,7 +1264,7 @@ button:active {
 .side-note {
   padding: 15px 16px;
   border: 1px solid var(--line);
-  border-radius: 24px;
+  border-radius: 20px 20px 20px 8px;
   background: rgba(252, 252, 252, 0.64);
   box-shadow: var(--shadow-soft);
   backdrop-filter: blur(6px);
@@ -1281,11 +1287,11 @@ button:active {
   align-items: end;
   justify-content: space-between;
   gap: 18px;
-  margin-bottom: 20px;
-  padding: 16px 18px;
+  margin-bottom: 16px;
+  padding: 14px 16px;
   border: 1px solid rgba(48, 48, 48, 0.1);
-  border-radius: 30px;
-  background: rgba(252, 252, 252, 0.58);
+  border-radius: 24px;
+  background: rgba(252, 252, 252, 0.64);
   box-shadow: var(--shadow-soft);
   backdrop-filter: blur(6px);
 }
@@ -1311,23 +1317,23 @@ button:active {
 .trigram-study-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  gap: 12px;
 }
 
 .study-trigram-card {
   display: grid;
-  grid-template-columns: 78px 1fr auto;
-  gap: 16px;
+  grid-template-columns: 70px 1fr auto;
+  gap: 14px;
   align-items: center;
-  min-height: 112px;
-  padding: 16px;
+  min-height: 100px;
+  padding: 14px;
   text-align: left;
   border: 1px solid var(--line);
-  border-radius: 30px 30px 30px 10px;
+  border-radius: 24px 24px 24px 8px;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.76), rgba(244, 244, 244, 0.74)),
     rgba(252, 252, 252, 0.82);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-soft);
   color: var(--ink);
   position: relative;
   overflow: hidden;
@@ -1348,8 +1354,8 @@ button:active {
 
 .study-trigram-card:hover {
   border-color: var(--ink);
-  transform: translateY(-3px);
-  box-shadow: 0 24px 68px rgba(30, 30, 30, 0.14);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 42px rgba(30, 30, 30, 0.11);
 }
 
 .study-trigram-card:hover::after {
@@ -1358,8 +1364,8 @@ button:active {
 }
 
 .study-symbol {
-  width: 78px;
-  height: 78px;
+  width: 70px;
+  height: 70px;
   display: grid;
   place-items: center;
   border: 1px solid rgba(48, 48, 48, 0.12);
@@ -1379,7 +1385,7 @@ button:active {
 .study-trigram-card strong {
   display: block;
   font-family: var(--font-title);
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 500;
   margin-bottom: 6px;
 }
@@ -1555,10 +1561,10 @@ button:active {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 14px;
-  padding: 16px;
-  margin: 14px 0;
+  padding: 14px;
+  margin: 12px 0;
   border: 1px solid var(--line);
-  border-radius: 28px 28px 28px 10px;
+  border-radius: 22px 22px 22px 8px;
   background: rgba(252, 252, 252, 0.72);
   box-shadow: var(--shadow-soft);
   backdrop-filter: blur(8px);
@@ -1579,7 +1585,7 @@ button:active {
   display: block;
   margin: 4px 0;
   font-family: var(--font-title);
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 500;
   overflow-wrap: anywhere;
 }
@@ -1755,27 +1761,27 @@ button:active {
 
 @media (max-width: 680px) {
   .topbar {
-    padding: 18px;
+    padding: 14px;
     position: relative;
-    gap: 14px;
+    gap: 12px;
   }
 
   h1 {
-    font-size: 30px;
+    font-size: 28px;
   }
 
   .app-nav {
     position: fixed;
-    left: 12px;
-    right: 12px;
-    bottom: calc(10px + env(safe-area-inset-bottom));
+    left: 10px;
+    right: 10px;
+    bottom: calc(8px + env(safe-area-inset-bottom));
     z-index: 30;
     width: auto;
     justify-self: auto;
     padding: 4px;
-    background: rgba(247, 247, 247, 0.92);
+    background: rgba(247, 247, 247, 0.94);
     backdrop-filter: blur(18px);
-    box-shadow: 0 16px 48px rgba(30, 30, 30, 0.18);
+    box-shadow: 0 12px 32px rgba(30, 30, 30, 0.16);
   }
 
   .app-nav button {
@@ -1785,7 +1791,7 @@ button:active {
   }
 
   .workspace {
-    padding: 18px 14px calc(96px + env(safe-area-inset-bottom));
+    padding: 14px 12px calc(92px + env(safe-area-inset-bottom));
   }
 
   .trigram-nav,
@@ -1809,11 +1815,22 @@ button:active {
   .home-copy,
   .today-panel,
   .entry-card {
-    border-radius: 28px 28px 28px 10px;
+    border-radius: 24px 24px 24px 8px;
   }
 
   .home-copy {
-    min-height: 230px;
+    min-height: 190px;
+    padding: 22px;
+  }
+
+  .today-panel,
+  .entry-card {
+    min-height: auto;
+    padding: 18px;
+  }
+
+  .home-actions {
+    margin-top: 22px;
   }
 
   .plan-metrics {
@@ -1855,11 +1872,11 @@ button:active {
   .plan-panel,
   .tool-panel,
   .search-results {
-    box-shadow: 0 14px 36px rgba(30, 30, 30, 0.1);
+    box-shadow: 0 10px 26px rgba(30, 30, 30, 0.09);
   }
 
   .memory-card {
-    min-height: 330px;
+    min-height: 300px;
   }
 
   .card-controls {
@@ -1888,7 +1905,7 @@ button:active {
 
   body::after {
     background-size: cover;
-    opacity: 0.4;
+    opacity: 0.3;
   }
 
   .petal {
