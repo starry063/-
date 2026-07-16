@@ -1888,6 +1888,31 @@ button:active {
   outline: 0;
 }
 
+.auth-switch {
+  display: inline-flex;
+  min-height: 40px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: var(--arc-pill);
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.auth-switch button {
+  min-width: 58px;
+  border: 0;
+  border-radius: var(--arc-pill);
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  cursor: pointer;
+}
+
+.auth-switch button.active {
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
 .local-note {
   margin: 0 0 12px;
   line-height: 1.7;
@@ -2254,11 +2279,16 @@ button:active {
   .sync-form,
   .sync-form input,
   .sync-form .primary-button,
+  .auth-switch,
   .home-add-form,
   .home-add-input,
   .home-add-form input[type="text"],
   .home-add-form .primary-button {
     width: 100%;
+  }
+
+  .auth-switch button {
+    flex: 1;
   }
 
   .trigram-checks {

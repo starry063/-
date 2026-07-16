@@ -740,6 +740,7 @@ const syncState = {
   status: "本机缓存",
   message: "",
   configured: false,
+  authMode: "login",
   savingTimer: null,
   applyingCloudData: false
 };
@@ -755,6 +756,20 @@ function syncTableName() {
 function hasSyncConfig() {
   const config = syncConfig();
   return Boolean(config.supabaseUrl && config.supabaseAnonKey);
+}
+
+function friendlyAuthError(error) {
+  const message = error?.message || "";
+  if (!message) return "";
+  if (/invalid login credentials/i.test(message)) return "邮箱或密码不正确。";
+  if (/email not confirmed/i.test(message)) return "请先打开确认邮件，再回来登录。";
+  if (/password should be at least/i.test(message)) return "密码至少需要 6 位。";
+  if (/user already registered|already exists/i.test(message)) return "这个邮箱已注册，请直接登录。";
+  return message;
+}
+
+function authRedirectUrl() {
+  return window.location.href.split("#")[0].split("?")[0];
 }
 
 function serializeUserData() {
@@ -872,20 +887,26 @@ async function initCloudSync() {
 function renderSyncPanel(compact = false) {
   const email = syncState.user?.email || "";
   const configured = syncState.configured;
+  const isSignup = syncState.authMode === "signup";
   return `
     <section class="sync-panel ${compact ? "compact-sync" : ""}">
       <div>
         <span>账号同步</span>
         <strong>${email || syncState.status}</strong>
-        ${syncState.message ? `<small>${escapeHtml(syncState.message)}</small>` : `<small>${configured ? "邮箱登录后，手机和电脑自动同步" : "填写 sync-config.js 后启用云端账号"}</small>`}
+        ${syncState.message ? `<small>${escapeHtml(syncState.message)}</small>` : `<small>${configured ? "同一账号登录后，手机和电脑自动同步" : "填写 sync-config.js 后启用云端账号"}</small>`}
       </div>
       ${
         configured
           ? syncState.user
             ? `<button class="text-button" data-sync-action="logout">退出</button>`
             : `<form class="sync-form" data-sync-login>
+                <div class="auth-switch" role="group" aria-label="账号操作">
+                  <button type="button" class="${!isSignup ? "active" : ""}" data-sync-action="auth-mode" data-auth-mode="login">登录</button>
+                  <button type="button" class="${isSignup ? "active" : ""}" data-sync-action="auth-mode" data-auth-mode="signup">注册</button>
+                </div>
                 <input name="email" type="email" placeholder="输入邮箱" required />
-                <button class="primary-button" type="submit">登录 / 同步</button>
+                <input name="password" type="password" placeholder="输入密码" minlength="6" required autocomplete="${isSignup ? "new-password" : "current-password"}" />
+                <button class="primary-button" type="submit">${isSignup ? "注册并同步" : "登录同步"}</button>
               </form>`
           : `<button class="text-button" data-route="plan">配置说明</button>`
       }
@@ -1648,6 +1669,12 @@ document.addEventListener("click", (event) => {
     renderLearningApp();
     return;
   }
+  if (syncAction?.dataset.syncAction === "auth-mode") {
+    syncState.authMode = syncAction.dataset.authMode || "login";
+    syncState.message = "";
+    renderLearningApp();
+    return;
+  }
 
   const route = event.target.closest("[data-route]");
   if (route) {
@@ -1731,18 +1758,36 @@ document.addEventListener("submit", (event) => {
   const syncLogin = event.target.closest("[data-sync-login]");
   if (syncLogin) {
     event.preventDefault();
-    const email = new FormData(syncLogin).get("email");
+    const formData = new FormData(syncLogin);
+    const email = String(formData.get("email") || "").trim();
+    const password = String(formData.get("password") || "");
     if (!syncState.client) return;
-    syncState.status = "发送登录链接";
+    syncState.status = syncState.authMode === "signup" ? "注册中" : "登录中";
+    syncState.message = "";
     renderLearningApp();
-    syncState.client.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: window.location.href.split("#")[0]
+    const authRequest = syncState.authMode === "signup"
+      ? syncState.client.auth.signUp({
+          email,
+          password,
+          options: { emailRedirectTo: authRedirectUrl() }
+        })
+      : syncState.client.auth.signInWithPassword({ email, password });
+    authRequest.then(async ({ data, error }) => {
+      if (error) {
+        syncState.status = syncState.authMode === "signup" ? "注册失败" : "登录失败";
+        syncState.message = friendlyAuthError(error);
+        renderLearningApp();
+        return;
       }
-    }).then(({ error }) => {
-      syncState.status = error ? "发送失败" : "请查收邮箱";
-      syncState.message = error ? error.message : "点击邮件中的链接后会自动回到本页面。";
+      if (data?.session?.user) {
+        syncState.user = data.session.user;
+        syncState.status = "已登录";
+        syncState.message = "";
+        await loadCloudState();
+        return;
+      }
+      syncState.status = "请确认邮箱";
+      syncState.message = "已发送确认邮件。确认后回到这里，用邮箱和密码登录。";
       renderLearningApp();
     });
     return;
