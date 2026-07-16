@@ -4,3 +4,4 @@ dist/
 .env
 .env.*
 *.zip
+.deploy_keys/
