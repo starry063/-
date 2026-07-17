@@ -862,19 +862,56 @@ button:active {
   z-index: 1;
 }
 
+.card-controls {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.review-grades {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.retire-row {
+  display: flex;
+  justify-content: center;
+}
+
 .grade-button[data-grade="again"],
 .grade-button[data-memory-grade="again"] {
-  border-style: dashed;
+  border-color: rgba(142, 58, 58, 0.34);
+  background: rgba(142, 58, 58, 0.1);
+  color: #7d3333;
 }
 
 .grade-button[data-grade="hard"],
 .grade-button[data-memory-grade="hard"] {
-  border-color: rgba(48, 48, 48, 0.38);
+  border-color: rgba(146, 110, 45, 0.36);
+  background: rgba(146, 110, 45, 0.11);
+  color: #725821;
 }
 
 .grade-button[data-grade="familiar"],
 .grade-button[data-memory-grade="familiar"] {
-  border-color: var(--ink);
+  border-color: rgba(54, 111, 82, 0.36);
+  background: rgba(54, 111, 82, 0.12);
+  color: #315f48;
+}
+
+.grade-button[data-grade="again"]:hover,
+.grade-button[data-memory-grade="again"]:hover {
+  background: rgba(142, 58, 58, 0.16);
+}
+
+.grade-button[data-grade="hard"]:hover,
+.grade-button[data-memory-grade="hard"]:hover {
+  background: rgba(146, 110, 45, 0.17);
+}
+
+.grade-button[data-grade="familiar"]:hover,
+.grade-button[data-memory-grade="familiar"]:hover {
+  background: rgba(54, 111, 82, 0.18);
 }
 
 .quiz-question {
@@ -1888,6 +1925,13 @@ button:active {
   outline: 0;
 }
 
+.sync-form .auth-resend {
+  align-self: center;
+  min-height: 0;
+  padding: 4px 6px;
+  font-size: 13px;
+}
+
 .auth-switch {
   display: inline-flex;
   min-height: 40px;
@@ -1921,6 +1965,10 @@ button:active {
 .ghost-grade {
   color: var(--muted);
   border-style: dashed;
+  min-height: 32px;
+  padding: 4px 10px;
+  background: transparent;
+  font-size: 13px;
 }
 
 .result-button {

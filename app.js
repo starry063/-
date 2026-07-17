@@ -491,11 +491,14 @@ function renderCards() {
         </div>
       </div>
       <div class="card-controls">
-        <button class="primary-button" id="flipCard">${state.cardFlipped ? "收起答案" : "显示答案"}</button>
-        <button class="grade-button" data-grade="again">陌生</button>
-        <button class="grade-button" data-grade="hard">模糊</button>
-        <button class="grade-button" data-grade="familiar">熟悉</button>
-        <button class="grade-button" id="retireCard">不再复习</button>
+        <div class="review-grades">
+          <button class="grade-button" data-grade="familiar">熟悉</button>
+          <button class="grade-button" data-grade="hard">模糊</button>
+          <button class="grade-button" data-grade="again">陌生</button>
+        </div>
+        <div class="retire-row">
+          <button class="grade-button ghost-grade" id="retireCard">不再复习</button>
+        </div>
       </div>
     </div>
   `;
@@ -741,6 +744,7 @@ const syncState = {
   message: "",
   configured: false,
   authMode: "login",
+  pendingEmail: "",
   savingTimer: null,
   applyingCloudData: false
 };
@@ -770,6 +774,15 @@ function friendlyAuthError(error) {
 
 function authRedirectUrl() {
   return window.location.href.split("#")[0].split("?")[0];
+}
+
+async function resendSignupEmail(email) {
+  if (!syncState.client || !email) return { error: new Error("请输入邮箱。") };
+  return syncState.client.auth.resend({
+    type: "signup",
+    email,
+    options: { emailRedirectTo: authRedirectUrl() }
+  });
 }
 
 function serializeUserData() {
@@ -906,7 +919,9 @@ function renderSyncPanel(compact = false) {
                 </div>
                 <input name="email" type="email" placeholder="输入邮箱" required />
                 <input name="password" type="password" placeholder="输入密码" minlength="6" required autocomplete="${isSignup ? "new-password" : "current-password"}" />
+                ${isSignup ? `<input name="passwordConfirm" type="password" placeholder="确认密码" minlength="6" required autocomplete="new-password" />` : ""}
                 <button class="primary-button" type="submit">${isSignup ? "注册并同步" : "登录同步"}</button>
+                ${isSignup ? `<button class="text-button auth-resend" type="button" data-sync-action="resend-signup">重发验证邮件</button>` : ""}
               </form>`
           : `<button class="text-button" data-route="plan">配置说明</button>`
       }
@@ -1573,11 +1588,14 @@ function renderMemoryCards() {
           </div>
         </div>
         <div class="card-controls">
-          <button class="primary-button" data-memory-action="flip">${learningState.cardFlipped ? "隐藏答案" : "显示答案"}</button>
-          <button class="grade-button" data-memory-grade="again">陌生</button>
-          <button class="grade-button" data-memory-grade="hard">模糊</button>
-          <button class="grade-button" data-memory-grade="familiar">熟悉</button>
-          <button class="grade-button ghost-grade" data-memory-action="retire">不再复习</button>
+          <div class="review-grades">
+            <button class="grade-button" data-memory-grade="familiar">熟悉</button>
+            <button class="grade-button" data-memory-grade="hard">模糊</button>
+            <button class="grade-button" data-memory-grade="again">陌生</button>
+          </div>
+          <div class="retire-row">
+            <button class="grade-button ghost-grade" data-memory-action="retire">不再复习</button>
+          </div>
         </div>
       </div>
 
@@ -1675,6 +1693,20 @@ document.addEventListener("click", (event) => {
     renderLearningApp();
     return;
   }
+  if (syncAction?.dataset.syncAction === "resend-signup") {
+    const form = syncAction.closest("[data-sync-login]");
+    const email = String(new FormData(form).get("email") || syncState.pendingEmail || "").trim();
+    syncState.pendingEmail = email;
+    syncState.status = "发送验证邮件";
+    syncState.message = "";
+    renderLearningApp();
+    resendSignupEmail(email).then(({ error }) => {
+      syncState.status = error ? "发送失败" : "验证邮件已发送";
+      syncState.message = error ? friendlyAuthError(error) : "请打开邮箱确认账号，确认后回来登录。";
+      renderLearningApp();
+    });
+    return;
+  }
 
   const route = event.target.closest("[data-route]");
   if (route) {
@@ -1761,9 +1793,17 @@ document.addEventListener("submit", (event) => {
     const formData = new FormData(syncLogin);
     const email = String(formData.get("email") || "").trim();
     const password = String(formData.get("password") || "");
+    const passwordConfirm = String(formData.get("passwordConfirm") || "");
     if (!syncState.client) return;
+    if (syncState.authMode === "signup" && password !== passwordConfirm) {
+      syncState.status = "注册失败";
+      syncState.message = "两次输入的密码不一致。";
+      renderLearningApp();
+      return;
+    }
     syncState.status = syncState.authMode === "signup" ? "注册中" : "登录中";
     syncState.message = "";
+    syncState.pendingEmail = email;
     renderLearningApp();
     const authRequest = syncState.authMode === "signup"
       ? syncState.client.auth.signUp({
@@ -1780,12 +1820,22 @@ document.addEventListener("submit", (event) => {
         return;
       }
       if (data?.session?.user) {
-        syncState.user = data.session.user;
-        syncState.status = "已登录";
-        syncState.message = "";
-        await loadCloudState();
+        if (syncState.authMode === "signup") {
+          await syncState.client.auth.signOut();
+          syncState.user = null;
+          syncState.authMode = "login";
+          syncState.status = "注册完成";
+          syncState.message = "当前 Supabase 未强制邮箱验证，请直接用邮箱和密码登录。";
+          renderLearningApp();
+        } else {
+          syncState.user = data.session.user;
+          syncState.status = "已登录";
+          syncState.message = "";
+          await loadCloudState();
+        }
         return;
       }
+      syncState.authMode = "login";
       syncState.status = "请确认邮箱";
       syncState.message = "已发送确认邮件。确认后回到这里，用邮箱和密码登录。";
       renderLearningApp();
