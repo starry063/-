@@ -1190,86 +1190,132 @@ button:active {
 .bagua-reference {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 14px;
+  margin-bottom: 16px;
 }
 
 .bagua-card {
   position: relative;
-  min-height: 360px;
-  border: 1px solid var(--line);
-  border-radius: var(--arc-card);
+  min-height: 390px;
+  border: 1px solid rgba(48, 48, 48, 0.2);
+  border-radius: 50%;
   background:
-    radial-gradient(circle at center, rgba(255, 255, 255, 0.88) 0 17%, transparent 17% 100%),
-    radial-gradient(circle at center, transparent 0 38%, rgba(48, 48, 48, 0.06) 38% 39%, transparent 39% 100%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.74), rgba(245, 245, 245, 0.68));
+    radial-gradient(circle at center, rgba(252, 252, 252, 0.96) 0 20%, transparent 20% 100%),
+    radial-gradient(circle at center, transparent 0 38%, rgba(48, 48, 48, 0.12) 38% 38.35%, transparent 38.35% 100%),
+    radial-gradient(circle at center, transparent 0 48%, rgba(48, 48, 48, 0.08) 48% 48.35%, transparent 48.35% 100%),
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.7), rgba(236, 236, 236, 0.48));
   box-shadow: var(--shadow-soft);
   overflow: hidden;
+  aspect-ratio: 1;
+  max-width: 440px;
+  width: 100%;
+  justify-self: center;
 }
 
 .bagua-card::before,
 .bagua-card::after {
   content: "";
   position: absolute;
-  inset: 46px;
-  border: 1px solid rgba(48, 48, 48, 0.1);
+  inset: 30px;
+  border: 1px solid rgba(48, 48, 48, 0.16);
   border-radius: 50%;
   pointer-events: none;
 }
 
 .bagua-card::after {
-  inset: 92px;
+  inset: 72px;
   opacity: 0.7;
+  border-style: double;
 }
 
 .bagua-center {
   position: absolute;
   inset: 50%;
-  width: 118px;
-  height: 118px;
+  width: 132px;
+  height: 132px;
   translate: -50% -50%;
   display: grid;
   place-items: center;
   align-content: center;
-  gap: 4px;
-  border: 1px solid rgba(48, 48, 48, 0.16);
+  gap: 3px;
+  border: 1px solid rgba(48, 48, 48, 0.2);
   border-radius: 50%;
-  background: rgba(252, 252, 252, 0.86);
+  background: rgba(252, 252, 252, 0.9);
   text-align: center;
   z-index: 2;
+  box-shadow: inset 0 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+.taiji-mark {
+  position: relative;
+  width: 62px;
+  height: 62px;
+  display: block;
+  border: 1px solid rgba(32, 32, 32, 0.78);
+  border-radius: 50%;
+  background: linear-gradient(90deg, var(--ink) 0 50%, var(--paper) 50% 100%);
+  overflow: hidden;
+}
+
+.taiji-mark::before,
+.taiji-mark::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 31px;
+  height: 31px;
+  margin-left: -15.5px;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.taiji-mark::before {
+  top: 0;
+  background: var(--paper);
+  border: 10px solid var(--ink);
+}
+
+.taiji-mark::after {
+  bottom: 0;
+  background: var(--ink);
+  border: 10px solid var(--paper);
 }
 
 .bagua-center strong {
   font-family: var(--font-title);
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 500;
+  line-height: 1.1;
 }
 
-.bagua-center span,
+.bagua-center em,
 .bagua-node span {
   color: var(--muted);
   font-size: 12px;
+  font-style: normal;
 }
 
 .bagua-node {
   position: absolute;
-  width: 76px;
-  min-height: 58px;
+  width: 78px;
+  min-height: 78px;
   display: grid;
   place-items: center;
   gap: 2px;
-  padding: 8px 9px;
-  border: 1px solid rgba(48, 48, 48, 0.14);
-  border-radius: 18px 18px 18px 6px;
-  background: rgba(252, 252, 252, 0.82);
+  padding: 8px;
+  border: 1px solid rgba(48, 48, 48, 0.2);
+  border-radius: 50%;
+  background: rgba(252, 252, 252, 0.86);
   color: var(--ink);
   text-align: center;
   z-index: 3;
-  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.46);
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
 }
 
 .bagua-node strong {
   font-family: var(--font-title);
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 500;
   line-height: 1;
 }
@@ -1278,50 +1324,51 @@ button:active {
   border-color: var(--ink);
   background: rgba(252, 252, 252, 0.96);
   transform: translateY(-1px);
+  box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.72), 0 10px 20px rgba(30, 30, 30, 0.1);
 }
 
 .bagua-node.top {
-  top: 22px;
+  top: 20px;
   left: 50%;
   translate: -50% 0;
 }
 
 .bagua-node.top-right {
-  top: 66px;
-  right: 52px;
+  top: 68px;
+  right: 58px;
 }
 
 .bagua-node.right {
   top: 50%;
-  right: 22px;
+  right: 20px;
   translate: 0 -50%;
 }
 
 .bagua-node.bottom-right {
-  right: 52px;
-  bottom: 66px;
+  right: 58px;
+  bottom: 68px;
 }
 
 .bagua-node.bottom {
-  bottom: 22px;
+  bottom: 20px;
   left: 50%;
   translate: -50% 0;
 }
 
 .bagua-node.bottom-left {
-  bottom: 66px;
-  left: 52px;
+  bottom: 68px;
+  left: 58px;
 }
 
 .bagua-node.left {
   top: 50%;
-  left: 22px;
+  left: 20px;
   translate: 0 -50%;
 }
 
 .bagua-node.top-left {
-  top: 66px;
-  left: 52px;
+  top: 68px;
+  left: 58px;
 }
 
 .plan-panel {
@@ -2188,38 +2235,57 @@ button:active {
   }
 
   .bagua-card {
-    min-height: 330px;
+    min-height: auto;
+    max-width: min(360px, 100%);
   }
 
   .bagua-card::before {
-    inset: 42px;
+    inset: 24px;
   }
 
   .bagua-card::after {
-    inset: 86px;
+    inset: 64px;
   }
 
   .bagua-center {
-    width: 104px;
-    height: 104px;
+    width: 116px;
+    height: 116px;
   }
 
   .bagua-center strong {
-    font-size: 20px;
-  }
-
-  .bagua-node {
-    width: 68px;
-    min-height: 54px;
-    padding: 7px;
-  }
-
-  .bagua-node strong {
     font-size: 17px;
   }
 
+  .taiji-mark {
+    width: 52px;
+    height: 52px;
+  }
+
+  .taiji-mark::before,
+  .taiji-mark::after {
+    width: 26px;
+    height: 26px;
+    margin-left: -13px;
+    border-width: 8px;
+  }
+
+  .bagua-node {
+    width: 64px;
+    min-height: 64px;
+    padding: 6px;
+  }
+
+  .bagua-node strong {
+    font-size: 16px;
+  }
+
+  .bagua-node span {
+    font-size: 11px;
+  }
+
   .bagua-node.top-right {
-    right: 34px;
+    top: 56px;
+    right: 36px;
   }
 
   .bagua-node.right {
@@ -2227,11 +2293,13 @@ button:active {
   }
 
   .bagua-node.bottom-right {
-    right: 34px;
+    right: 36px;
+    bottom: 56px;
   }
 
   .bagua-node.bottom-left {
-    left: 34px;
+    left: 36px;
+    bottom: 56px;
   }
 
   .bagua-node.left {
@@ -2239,7 +2307,8 @@ button:active {
   }
 
   .bagua-node.top-left {
-    left: 34px;
+    top: 56px;
+    left: 36px;
   }
 
   .home-add-panel .form-message {

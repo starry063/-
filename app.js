@@ -1244,7 +1244,6 @@ function renderLearningHome() {
         <div><span>已学习</span><strong>${summary.total}</strong></div>
         <div><span>熟悉率</span><strong>${summary.mastery}%</strong></div>
       </div>
-      ${renderBaguaReference()}
       ${renderHomeAddPanel()}
       ${renderSyncPanel(true)}
     </section>
@@ -1272,8 +1271,9 @@ function renderBaguaDiagram(title, subtitle, positions) {
   return `
     <article class="bagua-card">
       <div class="bagua-center">
+        <span class="taiji-mark" aria-hidden="true"></span>
         <strong>${title}</strong>
-        <span>${subtitle}</span>
+        <em>${subtitle}</em>
       </div>
       ${positions.map(([name, direction, position]) => {
         const trigram = trigramByName(name);
@@ -1401,6 +1401,7 @@ function renderTrigramLearningIndex() {
         <h2>选择卦象</h2>
       </div>
     </section>
+    ${renderBaguaReference()}
     <section class="trigram-study-grid">
       ${TRIGRAMS.map((trigram) => `
         <button class="study-trigram-card" data-study-trigram="${trigram.name}">
