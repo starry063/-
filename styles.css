@@ -876,6 +876,7 @@ button:active {
 .retire-row {
   display: flex;
   justify-content: center;
+  gap: 8px;
 }
 
 .grade-button[data-grade="again"],
@@ -1969,6 +1970,12 @@ button:active {
   padding: 4px 10px;
   background: transparent;
   font-size: 13px;
+}
+
+.ghost-grade:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+  transform: none;
 }
 
 .result-button {

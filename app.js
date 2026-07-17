@@ -724,6 +724,7 @@ const learningState = {
   selected: null,
   card: null,
   cardFlipped: false,
+  memoryHistory: [],
   deckTrigram: "all",
   progress: state.progress,
   review: readReviewState(),
@@ -1110,6 +1111,44 @@ function retireCard(card) {
     dueAt: ""
   };
   saveReviewState();
+}
+
+function rememberCurrentCard() {
+  if (!learningState.card) return;
+  const key = cardKey(learningState.card);
+  learningState.memoryHistory.push({
+    card: { ...learningState.card },
+    deckTrigram: learningState.deckTrigram,
+    wasFlipped: learningState.cardFlipped,
+    key,
+    previousProgress: Object.prototype.hasOwnProperty.call(learningState.progress, key)
+      ? learningState.progress[key]
+      : undefined,
+    previousReview: learningState.review[key] ? { ...learningState.review[key] } : undefined
+  });
+  if (learningState.memoryHistory.length > 10) learningState.memoryHistory.shift();
+}
+
+function restorePreviousCard() {
+  const previous = learningState.memoryHistory.pop();
+  if (!previous) return false;
+  if (previous.previousProgress === undefined) {
+    delete learningState.progress[previous.key];
+  } else {
+    learningState.progress[previous.key] = previous.previousProgress;
+  }
+  if (previous.previousReview === undefined) {
+    delete learningState.review[previous.key];
+  } else {
+    learningState.review[previous.key] = previous.previousReview;
+  }
+  state.progress = learningState.progress;
+  learningState.deckTrigram = previous.deckTrigram;
+  learningState.card = previous.card;
+  learningState.cardFlipped = previous.wasFlipped;
+  saveProgress();
+  saveReviewState();
+  return true;
 }
 
 function categoryCount(trigram) {
@@ -1594,6 +1633,7 @@ function renderMemoryCards() {
             <button class="grade-button" data-memory-grade="again">陌生</button>
           </div>
           <div class="retire-row">
+            <button class="grade-button ghost-grade" data-memory-action="previous" ${learningState.memoryHistory.length ? "" : "disabled"}>上一个</button>
             <button class="grade-button ghost-grade" data-memory-action="retire">不再复习</button>
           </div>
         </div>
@@ -1715,6 +1755,7 @@ document.addEventListener("click", (event) => {
     if (route.dataset.deck) {
       learningState.deckTrigram = route.dataset.deck;
       learningState.card = null;
+      learningState.memoryHistory = [];
     }
     renderLearningApp();
     return;
@@ -1742,6 +1783,7 @@ document.addEventListener("click", (event) => {
   if (deckFilter) {
     learningState.deckTrigram = deckFilter.dataset.deckFilter;
     learningState.card = null;
+    learningState.memoryHistory = [];
     renderLearningApp();
     return;
   }
@@ -1749,7 +1791,9 @@ document.addEventListener("click", (event) => {
   const action = event.target.closest("[data-memory-action]");
   if (action) {
     if (action.dataset.memoryAction === "flip") learningState.cardFlipped = !learningState.cardFlipped;
+    if (action.dataset.memoryAction === "previous") restorePreviousCard();
     if (action.dataset.memoryAction === "retire" && learningState.card) {
+      rememberCurrentCard();
       retireCard(learningState.card);
       learningState.card = null;
       pickLearningCard();
@@ -1761,6 +1805,7 @@ document.addEventListener("click", (event) => {
   const grade = event.target.closest("[data-memory-grade]");
   if (grade && learningState.card) {
     const memoryGrade = grade.dataset.memoryGrade;
+    rememberCurrentCard();
     learningState.progress[cardKey(learningState.card)] = memoryGrade;
     state.progress = learningState.progress;
     saveProgress();
@@ -1774,6 +1819,7 @@ document.addEventListener("click", (event) => {
   if (chip) {
     learningState.deckTrigram = learningState.selected || "all";
     learningState.screen = "cards";
+    learningState.memoryHistory = [];
     pickLearningCard(chip.dataset.chipCard);
     renderLearningApp();
     return;
