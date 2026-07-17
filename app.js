@@ -743,6 +743,7 @@ const syncState = {
   user: null,
   status: "本机缓存",
   message: "",
+  debug: "",
   configured: false,
   authMode: "login",
   pendingEmail: "",
@@ -771,7 +772,19 @@ function friendlyAuthError(error) {
   if (/password should be at least/i.test(message)) return "密码至少需要 6 位。";
   if (/user already registered|already exists/i.test(message)) return "这个邮箱已注册，请直接登录。";
   if (/token|otp/i.test(message)) return "验证码不正确或已过期。";
+  if (/rate limit|security purposes/i.test(message)) return "邮件发送太频繁，请稍后再试。";
   return message;
+}
+
+function authDebugText(label, result = {}) {
+  const error = result.error;
+  if (!error) return `${label}: ok`;
+  return [
+    `${label}: ${error.name || "AuthError"}`,
+    error.status ? `status ${error.status}` : "",
+    error.code ? `code ${error.code}` : "",
+    error.message || ""
+  ].filter(Boolean).join(" · ");
 }
 
 function authRedirectUrl() {
@@ -921,6 +934,7 @@ function renderSyncPanel(compact = false) {
         <span>账号同步</span>
         <strong>${email || syncState.status}</strong>
         ${syncState.message ? `<small>${escapeHtml(syncState.message)}</small>` : `<small>${configured ? "同一账号登录后，手机和电脑自动同步" : "填写 sync-config.js 后启用云端账号"}</small>`}
+        ${syncState.debug ? `<small class="auth-debug">${escapeHtml(syncState.debug)}</small>` : ""}
       </div>
       ${
         configured
@@ -1765,10 +1779,12 @@ document.addEventListener("click", (event) => {
     syncState.pendingEmail = email;
     syncState.status = "发送验证邮件";
     syncState.message = "";
+    syncState.debug = "";
     renderLearningApp();
     resendSignupEmail(email).then(({ error }) => {
       syncState.status = error ? "发送失败" : "验证邮件已发送";
       syncState.message = error ? friendlyAuthError(error) : "请打开邮箱确认账号，确认后回来登录。";
+      syncState.debug = authDebugText("resend", { error });
       renderLearningApp();
     });
     return;
@@ -1868,11 +1884,13 @@ document.addEventListener("submit", (event) => {
     syncState.pendingEmail = email;
     syncState.status = "确认邮箱";
     syncState.message = "";
+    syncState.debug = "";
     renderLearningApp();
     verifyEmailCode(email, token).then(async ({ data, error }) => {
       if (error) {
         syncState.status = "确认失败";
         syncState.message = friendlyAuthError(error);
+        syncState.debug = authDebugText("verifyOtp", { error });
         renderLearningApp();
         return;
       }
@@ -1902,6 +1920,7 @@ document.addEventListener("submit", (event) => {
     }
     syncState.status = syncState.authMode === "signup" ? "注册中" : "登录中";
     syncState.message = "";
+    syncState.debug = "";
     syncState.pendingEmail = email;
     renderLearningApp();
     const authRequest = syncState.authMode === "signup"
@@ -1915,13 +1934,19 @@ document.addEventListener("submit", (event) => {
       if (error) {
         syncState.status = syncState.authMode === "signup" ? "注册失败" : "登录失败";
         syncState.message = friendlyAuthError(error);
+        syncState.debug = authDebugText(syncState.authMode === "signup" ? "signUp" : "signInWithPassword", { error });
         renderLearningApp();
         return;
       }
+      syncState.debug = authDebugText(syncState.authMode === "signup" ? "signUp" : "signInWithPassword", { error });
       if (syncState.authMode === "signup" && Array.isArray(data?.user?.identities) && data.user.identities.length === 0) {
+        const resendResult = await resendSignupEmail(email);
         syncState.authMode = "verify";
-        syncState.status = "邮箱已存在";
-        syncState.message = "这个邮箱可能已经注册或待验证。可以点“重发验证邮件”，也可以返回登录。";
+        syncState.status = resendResult.error ? "邮箱已存在" : "验证邮件已发送";
+        syncState.message = resendResult.error
+          ? `这个邮箱可能已经注册或待验证，但重发失败：${friendlyAuthError(resendResult.error)}`
+          : "这个邮箱可能已注册且待验证，已请求重发验证邮件。";
+        syncState.debug = `${syncState.debug}；${authDebugText("resend", resendResult)}`;
         renderLearningApp();
         return;
       }
@@ -1948,6 +1973,7 @@ document.addEventListener("submit", (event) => {
         syncState.message = resendResult.error
           ? `账号已创建，但自动重发验证邮件失败：${friendlyAuthError(resendResult.error)}`
           : "已请求发送验证邮件。请检查收件箱、垃圾邮件，或把邮件中的验证码填到这里。";
+        syncState.debug = `${syncState.debug}；${authDebugText("resend", resendResult)}`;
         renderLearningApp();
         return;
       }

@@ -1959,6 +1959,13 @@ button:active {
   overflow-wrap: anywhere;
 }
 
+.sync-panel .auth-debug {
+  margin-top: 4px;
+  font-size: 11px;
+  opacity: 0.78;
+  overflow-wrap: anywhere;
+}
+
 .sync-form input {
   min-width: min(220px, 48vw);
   outline: 0;
