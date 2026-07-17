@@ -775,6 +775,8 @@ function friendlyAuthError(error) {
 }
 
 function authRedirectUrl() {
+  const configuredSiteUrl = syncConfig().siteUrl;
+  if (configuredSiteUrl) return configuredSiteUrl;
   return window.location.href.split("#")[0].split("?")[0];
 }
 
@@ -1913,6 +1915,13 @@ document.addEventListener("submit", (event) => {
       if (error) {
         syncState.status = syncState.authMode === "signup" ? "注册失败" : "登录失败";
         syncState.message = friendlyAuthError(error);
+        renderLearningApp();
+        return;
+      }
+      if (syncState.authMode === "signup" && Array.isArray(data?.user?.identities) && data.user.identities.length === 0) {
+        syncState.authMode = "login";
+        syncState.status = "邮箱已注册";
+        syncState.message = "这个邮箱可能已经注册过。请直接登录，或换一个邮箱重新注册测试。";
         renderLearningApp();
         return;
       }
