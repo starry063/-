@@ -770,6 +770,7 @@ function friendlyAuthError(error) {
   if (/email not confirmed/i.test(message)) return "请先打开确认邮件，再回来登录。";
   if (/password should be at least/i.test(message)) return "密码至少需要 6 位。";
   if (/user already registered|already exists/i.test(message)) return "这个邮箱已注册，请直接登录。";
+  if (/token|otp/i.test(message)) return "验证码不正确或已过期。";
   return message;
 }
 
@@ -784,6 +785,13 @@ async function resendSignupEmail(email) {
     email,
     options: { emailRedirectTo: authRedirectUrl() }
   });
+}
+
+async function verifyEmailCode(email, token) {
+  if (!syncState.client || !email || !token) return { error: new Error("请输入邮箱和验证码。") };
+  const signupResult = await syncState.client.auth.verifyOtp({ email, token, type: "signup" });
+  if (!signupResult.error) return signupResult;
+  return syncState.client.auth.verifyOtp({ email, token, type: "email" });
 }
 
 function serializeUserData() {
@@ -890,6 +898,7 @@ async function initCloudSync() {
   syncState.status = syncState.user ? "已登录" : "未登录";
   syncState.client.auth.onAuthStateChange((_event, session) => {
     syncState.user = session?.user || null;
+    if (syncState.user) syncState.authMode = "login";
     syncState.status = syncState.user ? "已登录" : "未登录";
     if (syncState.user) loadCloudState();
     renderLearningApp();
@@ -902,6 +911,8 @@ function renderSyncPanel(compact = false) {
   const email = syncState.user?.email || "";
   const configured = syncState.configured;
   const isSignup = syncState.authMode === "signup";
+  const isVerify = syncState.authMode === "verify";
+  const pendingEmail = syncState.pendingEmail || "";
   return `
     <section class="sync-panel ${compact ? "compact-sync" : ""}">
       <div>
@@ -913,7 +924,15 @@ function renderSyncPanel(compact = false) {
         configured
           ? syncState.user
             ? `<button class="text-button" data-sync-action="logout">退出</button>`
-            : `<form class="sync-form" data-sync-login>
+            : isVerify
+              ? `<form class="sync-form auth-verify-form" data-sync-verify>
+                  <input name="email" type="email" placeholder="输入邮箱" value="${escapeHtml(pendingEmail)}" required />
+                  <input name="token" type="text" inputmode="numeric" autocomplete="one-time-code" placeholder="输入邮箱验证码" required />
+                  <button class="primary-button" type="submit">确认邮箱</button>
+                  <button class="text-button auth-resend" type="button" data-sync-action="resend-signup">重发验证邮件</button>
+                  <button class="text-button auth-resend" type="button" data-sync-action="auth-mode" data-auth-mode="login">返回登录</button>
+                </form>`
+              : `<form class="sync-form" data-sync-login>
                 <div class="auth-switch" role="group" aria-label="账号操作">
                   <button type="button" class="${!isSignup ? "active" : ""}" data-sync-action="auth-mode" data-auth-mode="login">登录</button>
                   <button type="button" class="${isSignup ? "active" : ""}" data-sync-action="auth-mode" data-auth-mode="signup">注册</button>
@@ -1739,8 +1758,8 @@ document.addEventListener("click", (event) => {
     return;
   }
   if (syncAction?.dataset.syncAction === "resend-signup") {
-    const form = syncAction.closest("[data-sync-login]");
-    const email = String(new FormData(form).get("email") || syncState.pendingEmail || "").trim();
+    const form = syncAction.closest("form");
+    const email = String((form ? new FormData(form).get("email") : "") || syncState.pendingEmail || "").trim();
     syncState.pendingEmail = email;
     syncState.status = "发送验证邮件";
     syncState.message = "";
@@ -1838,6 +1857,33 @@ document.addEventListener("click", (event) => {
 });
 
 document.addEventListener("submit", (event) => {
+  const syncVerify = event.target.closest("[data-sync-verify]");
+  if (syncVerify) {
+    event.preventDefault();
+    const formData = new FormData(syncVerify);
+    const email = String(formData.get("email") || "").trim();
+    const token = String(formData.get("token") || "").trim();
+    syncState.pendingEmail = email;
+    syncState.status = "确认邮箱";
+    syncState.message = "";
+    renderLearningApp();
+    verifyEmailCode(email, token).then(async ({ data, error }) => {
+      if (error) {
+        syncState.status = "确认失败";
+        syncState.message = friendlyAuthError(error);
+        renderLearningApp();
+        return;
+      }
+      syncState.user = data?.session?.user || data?.user || syncState.user;
+      syncState.authMode = "login";
+      syncState.status = syncState.user ? "已登录" : "邮箱已确认";
+      syncState.message = syncState.user ? "" : "请使用邮箱和密码登录。";
+      if (syncState.user) await loadCloudState();
+      else renderLearningApp();
+    });
+    return;
+  }
+
   const syncLogin = event.target.closest("[data-sync-login]");
   if (syncLogin) {
     event.preventDefault();
@@ -1874,9 +1920,9 @@ document.addEventListener("submit", (event) => {
         if (syncState.authMode === "signup") {
           await syncState.client.auth.signOut();
           syncState.user = null;
-          syncState.authMode = "login";
-          syncState.status = "注册完成";
-          syncState.message = "当前 Supabase 未强制邮箱验证，请直接用邮箱和密码登录。";
+          syncState.authMode = "verify";
+          syncState.status = "未发送验证邮件";
+          syncState.message = "账号已创建，但 Supabase 当前未强制邮箱验证，所以不会自动发送验证邮件。请在 Supabase 开启 Confirm email，或直接返回登录。";
           renderLearningApp();
         } else {
           syncState.user = data.session.user;
@@ -1886,9 +1932,9 @@ document.addEventListener("submit", (event) => {
         }
         return;
       }
-      syncState.authMode = "login";
-      syncState.status = "请确认邮箱";
-      syncState.message = "已发送确认邮件。确认后回到这里，用邮箱和密码登录。";
+      syncState.authMode = "verify";
+      syncState.status = "验证邮件已发送";
+      syncState.message = "请打开邮箱点击确认链接，或把邮件中的验证码填到这里。确认后再登录同步。";
       renderLearningApp();
     });
     return;
