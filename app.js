@@ -1270,18 +1270,22 @@ function renderBaguaReference() {
 function renderBaguaDiagram(title, subtitle, positions) {
   return `
     <article class="bagua-card">
-      <div class="bagua-center">
-        <span class="taiji-mark" aria-hidden="true"></span>
+      <div class="bagua-title">
         <strong>${title}</strong>
-        <em>${subtitle}</em>
+        <span>${subtitle}</span>
       </div>
-      ${positions.map(([name, direction, position]) => {
-        const trigram = trigramByName(name);
-        return `<button class="bagua-node ${position}" data-study-trigram="${name}">
-          <strong>${name}${trigram.symbol}</strong>
-          <span>${direction}</span>
-        </button>`;
-      }).join("")}
+      <div class="bagua-wheel">
+        <div class="bagua-center">
+          <span class="taiji-mark" aria-hidden="true"></span>
+        </div>
+        ${positions.map(([name, direction, position]) => {
+          const trigram = trigramByName(name);
+          return `<button class="bagua-node ${position}" data-study-trigram="${name}">
+            <strong>${trigram.symbol}</strong>
+            <span>${name} · ${direction}</span>
+          </button>`;
+        }).join("")}
+      </div>
     </article>
   `;
 }
