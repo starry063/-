@@ -1919,9 +1919,9 @@ document.addEventListener("submit", (event) => {
         return;
       }
       if (syncState.authMode === "signup" && Array.isArray(data?.user?.identities) && data.user.identities.length === 0) {
-        syncState.authMode = "login";
-        syncState.status = "邮箱已注册";
-        syncState.message = "这个邮箱可能已经注册过。请直接登录，或换一个邮箱重新注册测试。";
+        syncState.authMode = "verify";
+        syncState.status = "邮箱已存在";
+        syncState.message = "这个邮箱可能已经注册或待验证。可以点“重发验证邮件”，也可以返回登录。";
         renderLearningApp();
         return;
       }
@@ -1939,6 +1939,16 @@ document.addEventListener("submit", (event) => {
           syncState.message = "";
           await loadCloudState();
         }
+        return;
+      }
+      if (syncState.authMode === "signup") {
+        const resendResult = await resendSignupEmail(email);
+        syncState.authMode = "verify";
+        syncState.status = resendResult.error ? "注册成功" : "验证邮件已发送";
+        syncState.message = resendResult.error
+          ? `账号已创建，但自动重发验证邮件失败：${friendlyAuthError(resendResult.error)}`
+          : "已请求发送验证邮件。请检查收件箱、垃圾邮件，或把邮件中的验证码填到这里。";
+        renderLearningApp();
         return;
       }
       syncState.authMode = "verify";
